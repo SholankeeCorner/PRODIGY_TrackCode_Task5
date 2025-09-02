@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Calorie Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .card {
+            background-color: #2d3748;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .food-item {
+            background-color: #4a5568;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .food-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .selected {
+            border: 3px solid #63b3ed;
+        }
+        #results-card {
+            display: none;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 md:p-8">
+
+    <div class="container mx-auto p-6 space-y-8">
+        <h1 class="text-4xl md:text-5xl font-bold text-center text-white mb-4">
+            Food Calorie Tracker
+        </h1>
+        <p class="text-center text-gray-400 max-w-2xl mx-auto">
+            Select a food item to see its estimated calorie content. This application simulates a machine learning model that would recognize food from an image and provide nutritional information.
+        </p>
+
+        <!-- Image Selection Section -->
+        <div class="card p-6 md:p-8">
+            <h2 class="text-2xl font-semibold mb-6 text-white">Select a Food Item</h2>
+            <div id="food-gallery" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- Food items will be dynamically generated here -->
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-card" class="card p-6 md:p-8">
+            <h2 class="text-2xl font-semibold mb-6 text-white">Recognition Results</h2>
+            <div class="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
+                <div class="flex-shrink-0">
+                    <img id="food-image" src="" alt="Selected food item" class="w-32 h-32 md:w-48 md:h-48 object-cover rounded-xl shadow-md">
+                </div>
+                <div class="flex-grow text-center md:text-left">
+                    <p class="text-sm text-gray-400 mb-1">Recognized Food:</p>
+                    <h3 id="food-name" class="text-3xl font-bold text-white mb-4"></h3>
+                    <p class="text-sm text-gray-400 mb-1">Estimated Calories:</p>
+                    <p id="calorie-count" class="text-4xl font-extrabold text-blue-400"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // A simulated food database with image URLs and calorie data
+        const foodDatabase = [
+            { id: 'apple', name: 'Apple', calories: 95, image: 'https://placehold.co/300x300/e0f2f1/083344?text=Apple' },
+            { id: 'banana', name: 'Banana', calories: 105, image: 'https://placehold.co/300x300/fffde7/4e342e?text=Banana' },
+            { id: 'pizza', name: 'Pizza Slice', calories: 285, image: 'https://placehold.co/300x300/fee2e2/991b1b?text=Pizza' },
+            { id: 'salad', name: 'Garden Salad', calories: 150, image: 'https://placehold.co/300x300/d1fae5/047857?text=Salad' },
+            { id: 'burger', name: 'Cheeseburger', calories: 500, image: 'https://placehold.co/300x300/fecaca/991b1b?text=Burger' },
+            { id: 'sushi', name: 'Sushi Roll', calories: 300, image: 'https://placehold.co/300x300/f0f9ff/0c4a6e?text=Sushi' },
+            { id: 'pasta', name: 'Pasta', calories: 450, image: 'https://placehold.co/300x300/dbeafe/1e40af?text=Pasta' },
+            { id: 'chicken', name: 'Grilled Chicken', calories: 250, image: 'https://placehold.co/300x300/ede9fe/4c1d95?text=Chicken' },
+        ];
+
+        // This function would represent our "AI model" recognizing the food item
+        function recognizeFood(foodId) {
+            return new Promise(resolve => {
+                // Simulate a delay for the model to "process" the image
+                setTimeout(() => {
+                    const item = foodDatabase.find(item => item.id === foodId);
+                    resolve(item);
+                }, 500); // 500ms processing time
+            });
+        }
+
+        // DOM elements
+        const foodGallery = document.getElementById('food-gallery');
+        const resultsCard = document.getElementById('results-card');
+        const foodImageEl = document.getElementById('food-image');
+        const foodNameEl = document.getElementById('food-name');
+        const calorieCountEl = document.getElementById('calorie-count');
+        let currentSelected = null;
+
+        // Populate the food gallery
+        foodDatabase.forEach(food => {
+            const div = document.createElement('div');
+            div.className = 'food-item p-4 rounded-xl flex flex-col items-center';
+            div.dataset.id = food.id;
+
+            const img = document.createElement('img');
+            img.src = food.image;
+            img.alt = food.name;
+            img.className = 'w-24 h-24 rounded-lg object-cover mb-2 shadow-sm';
+
+            const p = document.createElement('p');
+            p.textContent = food.name;
+            p.className = 'text-center text-sm font-medium text-gray-200';
+
+            div.appendChild(img);
+            div.appendChild(p);
+            foodGallery.appendChild(div);
+
+            div.addEventListener('click', () => {
+                if (currentSelected) {
+                    currentSelected.classList.remove('selected');
+                }
+                div.classList.add('selected');
+                currentSelected = div;
+
+                // Call the "recognition model"
+                recognizeFood(food.id).then(result => {
+                    if (result) {
+                        // Display the results
+                        foodImageEl.src = result.image;
+                        foodNameEl.textContent = result.name;
+                        calorieCountEl.textContent = `${result.calories} kcal`;
+                        resultsCard.style.display = 'block';
+                        
+                        // Scroll to the results section smoothly
+                        resultsCard.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
